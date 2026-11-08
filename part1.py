@@ -59,3 +59,27 @@ with open("outputs/part1_results.txt", "w") as file:
     file.write(f"ci95_high={ci95_high:.6f}\n")
 
 
+# TASK 1.2: HYPOTHESIS TESTING
+
+# Hypothesised population mean
+mu_0 = 8.0
+
+# Calculate Z-statistic
+z_stat = (mean_value - mu_0) / se_value
+
+# Make decision at 5% significance level
+if abs(z_stat) > 1.96:
+    reject_h0 = "yes"
+else:
+    reject_h0 = "no"
+
+# Display results
+print("\nTASK 1.2 RESULTS")
+print("-------------------------")
+print("z_stat:", z_stat)
+print("reject_h0:", reject_h0)
+
+# Append results to output file
+with open("outputs/part1_results.txt", "a") as file:
+    file.write(f"z_stat={z_stat:.6f}\n")
+    file.write(f"reject_h0={reject_h0}\n")
