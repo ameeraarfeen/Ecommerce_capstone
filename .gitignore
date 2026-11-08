@@ -1,0 +1,22 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated reports
+eda_report.html
+
+# Editor / OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Environment secrets
+.env
