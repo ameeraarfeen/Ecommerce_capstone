@@ -369,3 +369,117 @@ with open("outputs/part1_results.txt", "a") as file:
     file.write(f"resid_sd_ratio_log={resid_sd_ratio_log}\n")
 
 print("Task 1.6 completed successfully!")
+
+# TASK 1.7 - MULTIPLE REGRESSION BY NORMAL EQUATION
+
+# PART A: EXTRACT THE REQUIRED PREDICTORS
+
+# X1: Customer tenure
+X1 = np.array([
+    float(row["customer_tenure_months"]) for row in rows
+])
+
+# X2: Complaint count
+X2 = np.array([
+    float(row["complaint_count_90d"]) for row in rows
+])
+
+# X3: Discount order share
+X3 = np.array([
+    float(row["discount_order_share"]) for row in rows
+])
+
+# X5: Loyalty score
+X5 = np.array([
+    float(row["loyalty_score"]) for row in rows
+])
+
+# X6: COD flag
+X6 = np.array([
+    float(row["cod_flag"]) for row in rows
+])
+
+# X7: Plus member flag
+X7 = np.array([
+    float(row["plus_member_flag"]) for row in rows
+])
+
+
+# PART B: CREATE THE DESIGN MATRIX
+
+# Constant column of ones for the intercept
+ones = np.ones(n)
+
+# Arrange columns in the exact assignment order:
+# 1, ln(X4), X1, X2, X3, X5, X6, X7
+
+design_matrix = np.column_stack((
+    ones,
+    np.log(X4),
+    X1,
+    X2,
+    X3,
+    X5,
+    X6,
+    X7
+))
+
+# Target variable
+Y = np.log(value)
+
+
+# PART C: CALCULATE COEFFICIENTS USING NORMAL EQUATION
+
+# Calculate X transpose multiplied by X
+XtX = design_matrix.T @ design_matrix
+
+# Calculate X transpose multiplied by Y
+XtY = design_matrix.T @ Y
+
+# Solve (X transpose X) beta = (X transpose Y)
+beta = np.linalg.solve(XtX, XtY)
+
+
+# PART D: CALCULATE PREDICTIONS AND R-SQUARED
+
+# Predicted log values
+mr_fitted = design_matrix @ beta
+
+# Residuals
+mr_residuals = Y - mr_fitted
+
+# Total sum of squares
+mr_tss = np.sum((Y - np.mean(Y)) ** 2)
+
+# Residual sum of squares
+mr_rss = np.sum(mr_residuals ** 2)
+
+# R-squared
+mr_r2 = 1 - (mr_rss / mr_tss)
+
+
+# PART E: CALCULATE ADJUSTED R-SQUARED
+
+# Number of predictors (excluding the constant)
+p = 7
+
+mr_adj_r2 = 1 - (1 - mr_r2) * (n - 1) / (n - p - 1)
+
+# Adjusted R-squared for Task 1.6 log-log model
+loglog_adj_r2 = (
+    1 - (1 - loglog_r2) * (n - 1) / (n - 1 - 1)
+)
+
+
+# PART F: WRITE RESULTS
+
+with open("outputs/part1_results.txt", "a") as file:
+
+    for i in range(8):
+        file.write(f"mr_beta_{i}={beta[i]}\n")
+
+    file.write(f"mr_r2={mr_r2}\n")
+    file.write(f"mr_adj_r2={mr_adj_r2}\n")
+    file.write(f"loglog_adj_r2={loglog_adj_r2}\n")
+
+print("Task 1.7 completed successfully!")
