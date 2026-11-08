@@ -183,3 +183,91 @@ with open("outputs/part1_results.txt", "a") as file:
     file.write(f"r2={r2:.6f}\n")
     file.write(f"rmse={rmse:.6f}\n")
     file.write(f"mae={mae:.6f}\n")
+
+# TASK 1.5: GRADIENT DESCENT
+
+# 1. Standardize X4 using sample standard deviation
+mean_X4 = np.mean(X4)
+sd_X4 = np.std(X4, ddof=1)
+
+z = (X4 - mean_X4) / sd_X4
+
+# 2. Initialize parameters
+m = 0.0
+c = 0.0
+
+# 3. Set learning rate and number of iterations
+learning_rate = 0.1
+iterations = 500
+
+# 4. Calculate initial cost (before any update)
+y_pred = m * z + c
+errors = value - y_pred
+
+gd_J0 = np.mean(errors ** 2)
+
+# 5. Perform gradient descent
+for i in range(1, iterations + 1):
+
+    # Calculate predictions
+    y_pred = m * z + c
+
+    # Calculate errors
+    errors = value - y_pred
+
+    # Calculate gradients
+    dm = (-2 / n) * np.sum(z * errors)
+    dc = (-2 / n) * np.sum(errors)
+
+    # Update slope and intercept
+    m = m - learning_rate * dm
+    c = c - learning_rate * dc
+
+    # Calculate cost after the update
+    y_pred = m * z + c
+    errors = value - y_pred
+    cost = np.mean(errors ** 2)
+
+    # Store cost at required checkpoints
+    if i == 1:
+        gd_J1 = cost
+    elif i == 10:
+        gd_J10 = cost
+    elif i == 100:
+        gd_J100 = cost
+    elif i == 500:
+        gd_J500 = cost
+
+# 6. Convert coefficients back to original X4 scale
+gd_slope = m / sd_X4
+
+gd_intercept = c - (m * mean_X4 / sd_X4)
+
+# 7. Compare with closed-form regression slope
+gd_slope_gap = abs(gd_slope - reg_slope)
+
+# DISPLAY RESULTS
+
+print("\nTASK 1.5 RESULTS")
+print("-------------------------")
+
+print("gd_J0:", gd_J0)
+print("gd_J1:", gd_J1)
+print("gd_J10:", gd_J10)
+print("gd_J100:", gd_J100)
+print("gd_J500:", gd_J500)
+print("gd_slope:", gd_slope)
+print("gd_intercept:", gd_intercept)
+print("gd_slope_gap:", gd_slope_gap)
+
+# APPEND RESULTS TO OUTPUT FILE
+
+with open("outputs/part1_results.txt", "a") as file:
+    file.write(f"gd_J0={gd_J0:.6f}\n")
+    file.write(f"gd_J1={gd_J1:.6f}\n")
+    file.write(f"gd_J10={gd_J10:.6f}\n")
+    file.write(f"gd_J100={gd_J100:.6f}\n")
+    file.write(f"gd_J500={gd_J500:.6f}\n")
+    file.write(f"gd_slope={gd_slope:.6f}\n")
+    file.write(f"gd_intercept={gd_intercept:.6f}\n")
+    file.write(f"gd_slope_gap={gd_slope_gap:.6f}\n")
