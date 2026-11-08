@@ -271,3 +271,101 @@ with open("outputs/part1_results.txt", "a") as file:
     file.write(f"gd_slope={gd_slope:.6f}\n")
     file.write(f"gd_intercept={gd_intercept:.6f}\n")
     file.write(f"gd_slope_gap={gd_slope_gap:.6f}\n")
+
+# TASK 1.6 - CHECK FOR A FUNNEL, THEN APPLY LOG REMEDY
+
+# PART A: RAW RESIDUAL FUNNEL
+
+# 1. Sort rows by Task 1.4 fitted values in ascending order
+# Stable sorting preserves original row order when fitted values are tied.
+raw_order = np.argsort(fitted_values, kind="stable")
+
+# 2. Rearrange residuals using the same sorted order
+raw_residuals_sorted = residuals[raw_order]
+
+# 3. Divide the 800 observations into two groups of 400
+mid = n // 2
+
+lower_residuals_raw = raw_residuals_sorted[:mid]
+upper_residuals_raw = raw_residuals_sorted[mid:]
+
+# 4. Calculate sample standard deviation of residuals
+resid_sd_lower_raw = np.std(lower_residuals_raw, ddof=1)
+resid_sd_upper_raw = np.std(upper_residuals_raw, ddof=1)
+
+# 5. Calculate upper-to-lower residual SD ratio
+resid_sd_ratio_raw = resid_sd_upper_raw / resid_sd_lower_raw
+
+
+# PART B: LOG-LOG REGRESSION
+
+# 1. Apply natural logarithm to X4 and value
+log_X4 = np.log(X4)
+log_value = np.log(value)
+
+# 2. Calculate means
+log_mean_X = np.mean(log_X4)
+log_mean_Y = np.mean(log_value)
+
+# 3. Calculate covariance and variance manually
+log_cov = np.sum(
+    (log_X4 - log_mean_X) * (log_value - log_mean_Y)
+) / (n - 1)
+
+log_var = np.sum((log_X4 - log_mean_X) ** 2) / (n - 1)
+
+# 4. Calculate slope and intercept
+loglog_slope = log_cov / log_var
+loglog_intercept = log_mean_Y - loglog_slope * log_mean_X
+
+# 5. Calculate fitted values and residuals
+loglog_fitted = loglog_intercept + loglog_slope * log_X4
+
+loglog_residuals = log_value - loglog_fitted
+
+# 6. Calculate R-squared and RMSE
+loglog_tss = np.sum((log_value - log_mean_Y) ** 2)
+loglog_rss = np.sum(loglog_residuals ** 2)
+
+loglog_r2 = 1 - (loglog_rss / loglog_tss)
+loglog_rmse = np.sqrt(loglog_rss / n)
+
+
+# PART C: LOG MODEL RESIDUAL FUNNEL
+
+# 1. Sort rows by log-log fitted values (stable sort)
+log_order = np.argsort(loglog_fitted, kind="stable")
+
+# 2. Rearrange log-model residuals
+log_residuals_sorted = loglog_residuals[log_order]
+
+# 3. Divide into lower and upper groups
+lower_residuals_log = log_residuals_sorted[:mid]
+upper_residuals_log = log_residuals_sorted[mid:]
+
+# 4. Calculate sample standard deviations
+resid_sd_lower_log = np.std(lower_residuals_log, ddof=1)
+resid_sd_upper_log = np.std(upper_residuals_log, ddof=1)
+
+# 5. Calculate upper-to-lower residual SD ratio
+resid_sd_ratio_log = resid_sd_upper_log / resid_sd_lower_log
+
+
+# PART D: WRITE TASK 1.6 RESULTS
+
+with open("outputs/part1_results.txt", "a") as file:
+
+    file.write(f"resid_sd_lower_raw={resid_sd_lower_raw}\n")
+    file.write(f"resid_sd_upper_raw={resid_sd_upper_raw}\n")
+    file.write(f"resid_sd_ratio_raw={resid_sd_ratio_raw}\n")
+
+    file.write(f"loglog_intercept={loglog_intercept}\n")
+    file.write(f"loglog_slope={loglog_slope}\n")
+    file.write(f"loglog_r2={loglog_r2}\n")
+    file.write(f"loglog_rmse={loglog_rmse}\n")
+
+    file.write(f"resid_sd_lower_log={resid_sd_lower_log}\n")
+    file.write(f"resid_sd_upper_log={resid_sd_upper_log}\n")
+    file.write(f"resid_sd_ratio_log={resid_sd_ratio_log}\n")
+
+print("Task 1.6 completed successfully!")
