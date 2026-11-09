@@ -1,0 +1,74 @@
+train_rows=560
+train_positives=119
+test_rows=240
+test_positives=51
+
+# Task 2.2 — Logistic Regression
+loss_epoch_0=0.6931471806
+loss_epoch_1=0.6752738777
+loss_epoch_10=0.5685085112
+loss_epoch_100=0.3951820356
+loss_epoch_1000=0.3703610063
+weight_X1=-0.5553533229
+weight_X2=0.5504718504
+weight_X3=0.9013377028
+weight_X4=-0.1459497411
+weight_X5=-0.2161885828
+weight_X6=0.2347639675
+weight_X7=-0.0120076536
+bias=-2.0695675888
+test_bce=0.3817833634
+
+# Task 2.3 — Learning Rate Comparison
+learning_rate_0.01_loss_200=0.5091223095
+learning_rate_0.1_loss_200=0.3775855787
+learning_rate_1.0_loss_200=0.3703426946
+
+# Task 2.4 — Odds Ratios
+odds_ratio_X1=0.5738694642
+odds_ratio_X2=1.7340710470
+odds_ratio_X3=2.4628955308
+odds_ratio_X4=0.8642011359
+odds_ratio_X5=0.8055833684
+odds_ratio_X6=1.2646102444
+odds_ratio_X7=0.9880641506
+
+# Task 2.5 — Classification Metrics
+tp_05=24
+fp_05=20
+tn_05=169
+fn_05=27
+accuracy_05=0.8041666666666667
+precision_05=0.5454545454545454
+recall_05=0.47058823529411764
+f1_05=0.5052631578947367
+specificity_05=0.8941798941798942
+tp_03=38
+fp_03=44
+tn_03=145
+fn_03=13
+accuracy_03=0.7625
+precision_03=0.4634146341463415
+recall_03=0.7450980392156863
+f1_03=0.5714285714285715
+specificity_03=0.7671957671957672
+blind_accuracy=0.7875
+
+# Task 2.7 — KNN
+knn_best_K=5
+knn_best_mean_cv_f1=0.4540538287
+knn_tp=17
+knn_fp=24
+knn_tn=165
+knn_fn=34
+knn_accuracy=0.7583333333
+knn_precision=0.4146341463
+knn_recall=0.3333333333
+knn_f1=0.3695652174
+
+# Task 2.8 — Cost-Sensitive Results
+cost_tau=0.15
+cost_train_at_tau=12150
+cost_test_at_tau=6050
+cost_test_at_0.5=11800
+cost_test_flag_nobody=20400
