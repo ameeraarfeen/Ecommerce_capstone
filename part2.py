@@ -335,6 +335,12 @@ for name, odds_ratio in zip(feature_names, odds_ratios):
 
     print(f"odds_ratio_{name}={odds_ratio:.10f}")
 
+with open("outputs/part2_results.txt", "a") as file:
+    file.write("\n# Task 2.4 — Odds Ratios\n")
+
+    for name, odds_ratio in odds_ratio_results.items():
+        file.write(f"odds_ratio_{name}={odds_ratio:.10f}\n")
+
 # TASK 2.5 — CONFUSION MATRIX AND METRICS
 
 def calculate_metrics(y_true, y_pred):
@@ -397,6 +403,19 @@ for threshold, metrics in [
         print(f"{key}_{str(threshold).replace('.', '')}={value}")
 
 print(f"\nblind_accuracy={blind_accuracy}")
+
+with open("outputs/part2_results.txt", "a") as file:
+
+    file.write("\n# Task 2.5 — Classification Metrics\n")
+
+    for threshold, metrics in [
+        ("05", metrics_05),
+        ("03", metrics_03)
+    ]:
+        for key, value in metrics.items():
+            file.write(f"{key}_{threshold}={value}\n")
+
+    file.write(f"blind_accuracy={blind_accuracy}\n")
 
 # TASK 2.6 — THRESHOLD SWEEP
 
@@ -588,6 +607,22 @@ print(f"knn_f1={knn_test_metrics['f1']:.10f}")
 
 print("\nTask 2.7 CSV saved to outputs/part2_knn_cv.csv")
 
+with open("outputs/part2_results.txt", "a") as file:
+
+    file.write("\n# Task 2.7 — KNN\n")
+
+    file.write(f"knn_best_K={best_K}\n")
+    file.write(f"knn_best_mean_cv_f1={best_cv_f1:.10f}\n")
+
+    for key in ["tp", "fp", "tn", "fn"]:
+        file.write(f"knn_{key}={knn_test_metrics[key]}\n")
+
+    for key in ["accuracy", "precision", "recall", "f1"]:
+        file.write(
+            f"knn_{key}={knn_test_metrics[key]:.10f}\n"
+        )
+
+
 # PART 2.8 — COST-SENSITIVE THRESHOLD
 
 # Cost of classification mistakes
@@ -694,3 +729,13 @@ print(f"cost_train_at_tau={cost_train_at_tau}")
 print(f"cost_test_at_tau={cost_test_at_tau}")
 print(f"cost_test_at_0.5={cost_test_at_0_5}")
 print(f"cost_test_flag_nobody={cost_test_flag_nobody}")
+
+with open("outputs/part2_results.txt", "a") as file:
+
+    file.write("\n# Task 2.8 — Cost-Sensitive Results\n")
+
+    file.write(f"cost_tau={cost_tau:.2f}\n")
+    file.write(f"cost_train_at_tau={cost_train_at_tau}\n")
+    file.write(f"cost_test_at_tau={cost_test_at_tau}\n")
+    file.write(f"cost_test_at_0.5={cost_test_at_0_5}\n")
+    file.write(f"cost_test_flag_nobody={cost_test_flag_nobody}\n")
