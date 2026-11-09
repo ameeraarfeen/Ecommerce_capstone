@@ -587,3 +587,110 @@ print(f"knn_recall={knn_test_metrics['recall']:.10f}")
 print(f"knn_f1={knn_test_metrics['f1']:.10f}")
 
 print("\nTask 2.7 CSV saved to outputs/part2_knn_cv.csv")
+
+# PART 2.8 — COST-SENSITIVE THRESHOLD
+
+# Cost of classification mistakes
+FP_COST = 50
+FN_COST = 400
+
+
+def calculate_cost(y_true, y_pred):
+    """
+    Calculate total classification cost.
+
+    False Positive cost = INR 50
+    False Negative cost = INR 400
+    """
+
+    fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+    fn = int(np.sum((y_true == 1) & (y_pred == 0)))
+
+    total_cost = FP_COST * fp + FN_COST * fn
+
+    return total_cost
+
+# SELECT THRESHOLD USING TRAINING DATA ONLY
+
+# Calculate probabilities for the training dataset
+# using the final logistic regression model from Task 2.2.
+train_probabilities = sigmoid(
+    X_train_scaled @ weights + bias
+)
+
+best_cost = float("inf")
+cost_tau = None
+cost_train_at_tau = None
+
+# Test thresholds: 0.05, 0.10, ..., 0.95
+for k in range(1, 20):
+
+    tau = k / 20
+
+    # Convert probabilities into binary predictions.
+    train_predictions = (
+        train_probabilities >= tau
+    ).astype(int)
+
+    # Calculate training cost.
+    train_cost = calculate_cost(
+        y_train,
+        train_predictions
+    )
+
+    print(
+        f"tau={tau:.2f}, "
+        f"training_cost={train_cost}"
+    )
+
+    # Strictly less than ensures smaller tau wins a tie.
+    if train_cost < best_cost:
+
+        best_cost = train_cost
+        cost_tau = tau
+        cost_train_at_tau = train_cost
+
+# EVALUATE SELECTED THRESHOLD ON TEST DATA
+
+test_predictions_at_cost_tau = (
+    test_probabilities >= cost_tau
+).astype(int)
+
+cost_test_at_tau = calculate_cost(
+    y_test,
+    test_predictions_at_cost_tau
+)
+
+# TEST COST AT THRESHOLD 0.5
+
+test_predictions_at_05 = (
+    test_probabilities >= 0.5
+).astype(int)
+
+cost_test_at_0_5 = calculate_cost(
+    y_test,
+    test_predictions_at_05
+)
+
+# TEST COST WHEN PREDICTING NOBODY WILL CHURN
+
+# Predict class 0 for every test observation.
+test_predictions_flag_nobody = np.zeros(
+    len(y_test),
+    dtype=int
+)
+
+cost_test_flag_nobody = calculate_cost(
+    y_test,
+    test_predictions_flag_nobody
+)
+
+# DISPLAY RESULTS
+
+print("\nPART 2.8 — COST-SENSITIVE RESULTS")
+print("================================")
+print(f"cost_tau={cost_tau:.2f}")
+print(f"cost_train_at_tau={cost_train_at_tau}")
+print(f"cost_test_at_tau={cost_test_at_tau}")
+print(f"cost_test_at_0.5={cost_test_at_0_5}")
+print(f"cost_test_flag_nobody={cost_test_flag_nobody}")
