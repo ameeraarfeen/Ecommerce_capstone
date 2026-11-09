@@ -315,3 +315,21 @@ with open("outputs/part2_results.txt", "a") as file:
         file.write(f"learning_rate_{lr}_loss_200={loss:.10f}\n")
 
 print("\nTask 2.3 results saved successfully.")
+
+# TASK 2.4 — ODDS RATIOS
+
+odds_ratios = np.exp(weights)
+
+feature_names = [
+    "X1", "X2", "X3", "X4", "X5", "X6", "X7"
+]
+
+odds_ratio_results = {}
+
+print("\nPART 2.4 — ODDS RATIOS")
+print("=" * 45)
+
+for name, odds_ratio in zip(feature_names, odds_ratios):
+    odds_ratio_results[name] = odds_ratio
+
+    print(f"odds_ratio_{name}={odds_ratio:.10f}")
