@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import csv
 
 # 1. Load the dataset
 df = pd.read_csv("data/records.csv")
@@ -396,3 +397,54 @@ for threshold, metrics in [
         print(f"{key}_{str(threshold).replace('.', '')}={value}")
 
 print(f"\nblind_accuracy={blind_accuracy}")
+
+# TASK 2.6 — THRESHOLD SWEEP
+
+threshold_results = []
+
+print("\nPART 2.6 — THRESHOLD SWEEP")
+print("=" * 50)
+
+for k in range(1, 10):
+
+    tau = k / 10
+
+    # Convert probabilities into binary predictions
+    predictions = (test_probabilities >= tau).astype(int)
+
+    # Calculate confusion matrix values
+    tp = int(np.sum((y_test == 1) & (predictions == 1)))
+    fp = int(np.sum((y_test == 0) & (predictions == 1)))
+    tn = int(np.sum((y_test == 0) & (predictions == 0)))
+    fn = int(np.sum((y_test == 1) & (predictions == 0)))
+
+    # Calculate TPR and FPR
+    tpr = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
+
+    threshold_results.append([
+        tau, tp, fp, tn, fn, tpr, fpr
+    ])
+
+    print(
+        f"tau={tau:.1f}, "
+        f"tp={tp}, fp={fp}, tn={tn}, fn={fn}, "
+        f"tpr={tpr:.6f}, fpr={fpr:.6f}"
+    )
+
+
+# Save results to CSV
+os.makedirs("outputs", exist_ok=True)
+
+with open("outputs/part2_thresholds.csv", "w", newline="") as file:
+
+    writer = csv.writer(file)
+
+    writer.writerow([
+        "tau", "tp", "fp", "tn", "fn", "tpr", "fpr"
+    ])
+
+    writer.writerows(threshold_results)
+
+
+print("\nThreshold results saved to outputs/part2_thresholds.csv")
