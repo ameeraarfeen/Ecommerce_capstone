@@ -221,3 +221,97 @@ with open("outputs/part2_results.txt", "a") as file:
     file.write(f"test_bce={test_bce:.10f}\n")
 
 print("\nTask 2.2 results saved to outputs/part2_results.txt")
+
+# PART 2.3 — EFFECT OF LEARNING RATE
+
+import numpy as np
+import os
+
+# STEP 1: DEFINE REQUIRED FUNCTIONS
+
+def sigmoid(z):
+    z = np.clip(z, -500, 500)
+    return 1 / (1 + np.exp(-z))
+
+
+def binary_cross_entropy(y_true, probabilities):
+    probabilities = np.clip(probabilities, 1e-15, 1 - 1e-15)
+
+    loss = -np.mean(
+        y_true * np.log(probabilities)
+        + (1 - y_true) * np.log(1 - probabilities)
+    )
+
+    return loss
+
+# STEP 2: DEFINE LEARNING RATES
+
+learning_rates = [0.01, 0.1, 1.0]
+
+iterations = 200
+n = len(X_train_scaled)
+
+learning_rate_results = {}
+
+# STEP 3: TRAIN A SEPARATE MODEL FOR EACH LEARNING RATE
+
+for lr in learning_rates:
+
+    # Restart weights and bias for every model
+    weights_lr = np.zeros(X_train_scaled.shape[1])
+    bias_lr = 0.0
+
+    # Perform 200 full-batch gradient descent updates
+    for epoch in range(1, iterations + 1):
+
+        # Calculate linear combination
+        z = X_train_scaled @ weights_lr + bias_lr
+
+        # Calculate predicted probabilities
+        probabilities = sigmoid(z)
+
+        # Calculate errors
+        errors = probabilities - y_train
+
+        # Calculate gradients
+        dw = (X_train_scaled.T @ errors) / n
+        db = np.sum(errors) / n
+
+        # Update weights and bias
+        weights_lr = weights_lr - lr * dw
+        bias_lr = bias_lr - lr * db
+
+    # Calculate final training loss after 200 updates
+    final_probabilities = sigmoid(
+        X_train_scaled @ weights_lr + bias_lr
+    )
+
+    final_loss = binary_cross_entropy(
+        y_train,
+        final_probabilities
+    )
+
+    learning_rate_results[lr] = final_loss
+
+
+# STEP 4: DISPLAY RESULTS
+
+print("PART 2.3 — LEARNING RATE COMPARISON")
+print("=" * 45)
+
+for lr, loss in learning_rate_results.items():
+    print(f"learning_rate_{lr}_loss_200={loss:.10f}")
+
+
+# STEP 5: SAVE RESULTS
+
+os.makedirs("outputs", exist_ok=True)
+
+with open("outputs/part2_results.txt", "a") as file:
+
+    file.write("\n# Task 2.3 — Learning Rate Comparison\n")
+
+    for lr, loss in learning_rate_results.items():
+        file.write(f"learning_rate_{lr}_loss_200={loss:.10f}\n")
+
+print("\nTask 2.3 results saved successfully.")
