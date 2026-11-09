@@ -448,3 +448,142 @@ with open("outputs/part2_thresholds.csv", "w", newline="") as file:
 
 
 print("\nThreshold results saved to outputs/part2_thresholds.csv")
+
+# PART 2.7 — K-NEAREST NEIGHBORS (KNN)
+
+def knn_predict(X_reference, y_reference, X_query, K):
+    predictions = np.zeros(len(X_query), dtype=int)
+
+    for i in range(len(X_query)):
+
+        # Step 1: Calculate distance from this query row
+        # to every row in the reference dataset.
+        differences = X_reference - X_query[i]
+        distances = np.sqrt(
+            np.sum(differences ** 2, axis=1)
+        )
+
+        # Step 2: Get the indices of the K nearest rows.
+        # Stable sorting preserves original order when distances tie.
+        nearest_indices = np.argsort(
+            distances, kind="stable"
+        )[:K]
+
+        # Step 3: Get the churn labels of those neighbours.
+        neighbour_labels = y_reference[nearest_indices]
+
+        # Step 4: Majority voting.
+        positive_votes = np.sum(neighbour_labels == 1)
+        required_votes = (K + 1) // 2
+
+        predictions[i] = int(positive_votes >= required_votes)
+
+    return predictions
+
+# 5-FOLD CROSS-VALIDATION
+
+K_values = range(1, 22, 2)
+
+# Assign each training row to a fold using its
+# zero-based position in the training dataset.
+fold_ids = np.arange(len(y_train)) % 5
+
+knn_cv_results = []
+
+for K in K_values:
+
+    fold_f1_scores = []
+
+    for fold in range(5):
+
+        # Rows belonging to this fold are validation rows.
+        validation_mask = (fold_ids == fold)
+
+        # All remaining rows are reference/training rows.
+        reference_mask = ~validation_mask
+
+        X_reference = X_train_scaled[reference_mask]
+        y_reference = y_train[reference_mask]
+
+        X_validation = X_train_scaled[validation_mask]
+        y_validation = y_train[validation_mask]
+
+        # Predict validation labels using KNN.
+        validation_predictions = knn_predict(
+            X_reference,
+            y_reference,
+            X_validation,
+            K
+        )
+
+        # Calculate F1 for this fold.
+        fold_metrics = calculate_metrics(
+            y_validation,
+            validation_predictions
+        )
+
+        fold_f1_scores.append(fold_metrics["f1"])
+
+    # Mean of the five individual fold F1 scores.
+    mean_cv_f1 = float(np.mean(fold_f1_scores))
+
+    knn_cv_results.append([K, mean_cv_f1])
+
+    print(
+        f"K={K}, "
+        f"fold_F1={fold_f1_scores}, "
+        f"mean_cv_f1={mean_cv_f1:.10f}"
+    )
+
+# SELECT BEST K
+best_K = None
+best_cv_f1 = -1.0
+
+for K, mean_cv_f1 in knn_cv_results:
+
+    if mean_cv_f1 > best_cv_f1:
+        best_cv_f1 = mean_cv_f1
+        best_K = K
+
+print("\nBEST KNN MODEL")
+print("------------------------------")
+print(f"best_K={best_K}")
+print(f"best_mean_cv_f1={best_cv_f1:.10f}")
+
+# SAVE CROSS-VALIDATION RESULTS
+
+with open("outputs/part2_knn_cv.csv", "w", newline="") as file:
+
+    writer = csv.writer(file)
+
+    writer.writerow(["K", "mean_cv_f1"])
+    writer.writerows(knn_cv_results)
+
+# EVALUATE BEST K ON TEST DATA
+
+# Now use all 560 training rows as reference rows.
+knn_test_predictions = knn_predict(
+    X_train_scaled,
+    y_train,
+    X_test_scaled,
+    best_K
+)
+
+knn_test_metrics = calculate_metrics(
+    y_test,
+    knn_test_predictions
+)
+
+print("\nKNN TEST RESULTS")
+print("------------------------------")
+print(f"knn_best_K={best_K}")
+print(f"knn_tp={knn_test_metrics['tp']}")
+print(f"knn_fp={knn_test_metrics['fp']}")
+print(f"knn_tn={knn_test_metrics['tn']}")
+print(f"knn_fn={knn_test_metrics['fn']}")
+print(f"knn_accuracy={knn_test_metrics['accuracy']:.10f}")
+print(f"knn_precision={knn_test_metrics['precision']:.10f}")
+print(f"knn_recall={knn_test_metrics['recall']:.10f}")
+print(f"knn_f1={knn_test_metrics['f1']:.10f}")
+
+print("\nTask 2.7 CSV saved to outputs/part2_knn_cv.csv")
