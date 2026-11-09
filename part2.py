@@ -333,3 +333,66 @@ for name, odds_ratio in zip(feature_names, odds_ratios):
     odds_ratio_results[name] = odds_ratio
 
     print(f"odds_ratio_{name}={odds_ratio:.10f}")
+
+# TASK 2.5 — CONFUSION MATRIX AND METRICS
+
+def calculate_metrics(y_true, y_pred):
+
+    tp = int(np.sum((y_true == 1) & (y_pred == 1)))
+    fp = int(np.sum((y_true == 0) & (y_pred == 1)))
+    tn = int(np.sum((y_true == 0) & (y_pred == 0)))
+    fn = int(np.sum((y_true == 1) & (y_pred == 0)))
+
+    total = len(y_true)
+
+    accuracy = (tp + tn) / total
+
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+
+    f1 = (
+        2 * precision * recall / (precision + recall)
+        if (precision + recall) > 0 else 0.0
+    )
+
+    specificity = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+
+    return {
+        "tp": tp,
+        "fp": fp,
+        "tn": tn,
+        "fn": fn,
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1,
+        "specificity": specificity
+    }
+
+
+# Evaluate at threshold 0.5
+predictions_05 = (test_probabilities >= 0.5).astype(int)
+metrics_05 = calculate_metrics(y_test, predictions_05)
+
+# Evaluate at threshold 0.3
+predictions_03 = (test_probabilities >= 0.3).astype(int)
+metrics_03 = calculate_metrics(y_test, predictions_03)
+
+# Blind accuracy: predict every customer as 0
+blind_accuracy = np.mean(y_test == 0)
+
+# Display results
+print("\nPART 2.5 — CLASSIFICATION METRICS")
+print("=" * 50)
+
+for threshold, metrics in [
+    (0.5, metrics_05),
+    (0.3, metrics_03)
+]:
+    print(f"\nTHRESHOLD = {threshold}")
+
+    for key, value in metrics.items():
+        print(f"{key}_{str(threshold).replace('.', '')}={value}")
+
+print(f"\nblind_accuracy={blind_accuracy}")
