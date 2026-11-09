@@ -85,6 +85,139 @@ with open("outputs/part2_results.txt", "w") as file:
     file.write(f"test_rows={test_rows}\n")
     file.write(f"test_positives={test_positives}\n")
 
+# PART 2.2 — LOGISTIC REGRESSION FROM SCRATCH
 
-# task 2.2
+# STEP 1: SIGMOID FUNCTION
+def sigmoid(z):
+    z = np.clip(z, -500, 500)
+    return 1 / (1 + np.exp(-z))
 
+# STEP 2: BINARY CROSS-ENTROPY LOSS
+
+def binary_cross_entropy(y_true, probabilities):
+
+    probabilities = np.clip(probabilities, 1e-15, 1 - 1e-15)
+
+    loss = -np.mean(
+        y_true * np.log(probabilities)
+        + (1 - y_true) * np.log(1 - probabilities)
+    )
+
+    return loss
+
+# STEP 3: INITIALISE PARAMETERS
+
+n = len(X_train_scaled)
+
+weights = np.zeros(X_train_scaled.shape[1])
+bias = 0.0
+
+learning_rate = 0.1
+iterations = 1000
+
+# STEP 4: CALCULATE INITIAL LOSS (EPOCH 0)
+
+initial_z = X_train_scaled @ weights + bias
+
+initial_probabilities = sigmoid(initial_z)
+
+loss_epoch_0 = binary_cross_entropy(
+    y_train,
+    initial_probabilities
+)
+
+# STEP 5: TRAIN USING FULL-BATCH GRADIENT DESCENT
+
+loss_values = {}
+
+for epoch in range(1, iterations + 1):
+
+    # Calculate linear combination
+    z = X_train_scaled @ weights + bias
+
+    # Calculate predicted probabilities
+    probabilities = sigmoid(z)
+
+    # Calculate prediction errors
+    errors = probabilities - y_train
+
+    # Calculate gradients
+    dw = (X_train_scaled.T @ errors) / n
+    db = np.sum(errors) / n
+
+    # Update weights and bias
+    weights = weights - learning_rate * dw
+    bias = bias - learning_rate * db
+
+    # Calculate updated training loss
+    updated_z = X_train_scaled @ weights + bias
+    updated_probabilities = sigmoid(updated_z)
+
+    loss = binary_cross_entropy(
+        y_train,
+        updated_probabilities
+    )
+
+    # Store required epoch checkpoints
+    if epoch in [1, 10, 100, 1000]:
+        loss_values[epoch] = loss
+
+# STEP 6: EXTRACT LOSS CHECKPOINTS
+
+loss_epoch_1 = loss_values[1]
+loss_epoch_10 = loss_values[10]
+loss_epoch_100 = loss_values[100]
+loss_epoch_1000 = loss_values[1000]
+
+# STEP 7: EVALUATE MODEL ON TEST DATA
+
+test_z = X_test_scaled @ weights + bias
+
+test_probabilities = sigmoid(test_z)
+
+test_bce = binary_cross_entropy(
+    y_test,
+    test_probabilities
+)
+
+# STEP 8: DISPLAY RESULTS
+
+print("PART 2.2 — LOGISTIC REGRESSION RESULTS")
+print("=" * 45)
+
+print(f"loss_epoch_0={loss_epoch_0:.10f}")
+print(f"loss_epoch_1={loss_epoch_1:.10f}")
+print(f"loss_epoch_10={loss_epoch_10:.10f}")
+print(f"loss_epoch_100={loss_epoch_100:.10f}")
+print(f"loss_epoch_1000={loss_epoch_1000:.10f}")
+
+print("\nLEARNED WEIGHTS")
+print("-" * 30)
+
+for i, weight in enumerate(weights, start=1):
+    print(f"weight_X{i}={weight:.10f}")
+
+print(f"\nbias={bias:.10f}")
+print(f"test_bce={test_bce:.10f}")
+
+# STEP 9: SAVE RESULTS
+
+os.makedirs("outputs", exist_ok=True)
+
+with open("outputs/part2_results.txt", "a") as file:
+
+    file.write("\n# Task 2.2 — Logistic Regression\n")
+
+    file.write(f"loss_epoch_0={loss_epoch_0:.10f}\n")
+    file.write(f"loss_epoch_1={loss_epoch_1:.10f}\n")
+    file.write(f"loss_epoch_10={loss_epoch_10:.10f}\n")
+    file.write(f"loss_epoch_100={loss_epoch_100:.10f}\n")
+    file.write(f"loss_epoch_1000={loss_epoch_1000:.10f}\n")
+
+    for i, weight in enumerate(weights, start=1):
+        file.write(f"weight_X{i}={weight:.10f}\n")
+
+    file.write(f"bias={bias:.10f}\n")
+    file.write(f"test_bce={test_bce:.10f}\n")
+
+print("\nTask 2.2 results saved to outputs/part2_results.txt")
