@@ -3,6 +3,15 @@ import pandas as pd
 import os
 import csv
 
+from part2_helpers import (
+    load_split_data,
+    sigmoid,
+    binary_cross_entropy,
+    train_logistic,
+    knn_predict,
+    calculate_metrics
+)
+
 # 1. Load the dataset
 df = pd.read_csv("data/records.csv")
 
