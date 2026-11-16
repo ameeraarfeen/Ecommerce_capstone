@@ -34,13 +34,25 @@ def load_split_data(file_path="data/records.csv"):
     train_indices = []
     test_indices = []
 
-    for class_value in [0, 1]:
-        class_indices = np.where(y == class_value)[0]
-        split_point = int(0.7 * len(class_indices))
+    class_0_indices = np.where(y == 0)[0]
+    class_1_indices = np.where(y == 1)[0]
 
-        train_indices.extend(class_indices[:split_point])
-        test_indices.extend(class_indices[split_point:])
+    cutoff_0 = (7 * len(class_0_indices)) // 10
+    cutoff_1 = (7 * len(class_1_indices)) // 10
 
+    train_0 = class_0_indices[:cutoff_0]
+    test_0 = class_0_indices[cutoff_0:]
+
+    train_1 = class_1_indices[:cutoff_1]
+    test_1 = class_1_indices[cutoff_1:]
+
+    train_indices = np.sort(
+        np.concatenate((train_0, train_1))
+    )
+
+    test_indices = np.sort(
+        np.concatenate((test_0, test_1))
+    )
     train_indices = np.sort(train_indices)
     test_indices = np.sort(test_indices)
 
