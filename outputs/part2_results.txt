@@ -3,7 +3,7 @@ train_positives=119
 test_rows=240
 test_positives=51
 
-# Task 2.2 — Logistic Regression
+# Task 2.2 ï¿½ Logistic Regression
 loss_epoch_0=0.6931471806
 loss_epoch_1=0.6752738777
 loss_epoch_10=0.5685085112
@@ -19,12 +19,12 @@ weight_X7=-0.0120076536
 bias=-2.0695675888
 test_bce=0.3817833634
 
-# Task 2.3 — Learning Rate Comparison
+# Task 2.3 ï¿½ Learning Rate Comparison
 learning_rate_0.01_loss_200=0.5091223095
 learning_rate_0.1_loss_200=0.3775855787
 learning_rate_1.0_loss_200=0.3703426946
 
-# Task 2.4 — Odds Ratios
+# Task 2.4 ï¿½ Odds Ratios
 odds_ratio_X1=0.5738694642
 odds_ratio_X2=1.7340710470
 odds_ratio_X3=2.4628955308
@@ -33,7 +33,7 @@ odds_ratio_X5=0.8055833684
 odds_ratio_X6=1.2646102444
 odds_ratio_X7=0.9880641506
 
-# Task 2.5 — Classification Metrics
+# Task 2.5 ï¿½ Classification Metrics
 tp_05=24
 fp_05=20
 tn_05=169
@@ -54,7 +54,7 @@ f1_03=0.5714285714285715
 specificity_03=0.7671957671957672
 blind_accuracy=0.7875
 
-# Task 2.7 — KNN
+# Task 2.7 ï¿½ KNN
 knn_best_K=5
 knn_best_mean_cv_f1=0.4540538287
 knn_tp=17
@@ -66,7 +66,7 @@ knn_precision=0.4146341463
 knn_recall=0.3333333333
 knn_f1=0.3695652174
 
-# Task 2.8 — Cost-Sensitive Results
+# Task 2.8 ï¿½ Cost-Sensitive Results
 cost_tau=0.15
 cost_train_at_tau=12150
 cost_test_at_tau=6050
